@@ -1,0 +1,97 @@
+:root {
+    --fundo: #f1f4f9;
+    --azul: #2457d6;
+    --azul-hover: #1946b5;
+    --azul-claro: #e4ecff;
+    --vermelho: #e05252;
+    --verde-claro: #c8f7d2;
+    --verde-borda: #218838;
+    --texto: #182230;
+    --casa: #ffffff;
+}
+
+body.tema-escuro {
+    --fundo: #111827;
+    --texto: #f8fafc;
+    --casa: #1f2937;
+    --azul-claro: #374151;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: var(--fundo);
+    color: var(--texto);
+}
+
+.tabuleiro {
+    display: grid;
+    grid-template-columns: repeat(3, min(28vw, 100px));
+    gap: 5px;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+.tabuleiro button {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border: 2px solid var(--azul);
+    border-radius: 10px;
+    font-size: 42px;
+    cursor: pointer;
+    background-color: var(--casa);
+}
+
+/* Cor do X */
+.tabuleiro button.jogada-x {
+    color: var(--azul);
+}
+
+/* Cor do O */
+.tabuleiro button.jogada-o {
+    color: var(--vermelho);
+}
+
+.tabuleiro button:hover {
+    background-color: var(--azul-claro);
+}
+
+/* Destaque das casas que formaram a vitória */
+.tabuleiro button.vencedora,
+.tabuleiro button.vencedora:hover {
+    background-color: var(--verde-claro);
+    border-color: var(--verde-borda);
+}
+
+#reiniciar,
+#zerar-placar,
+#alternar-tema {
+    margin: 5px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--azul);
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#reiniciar:hover,
+#zerar-placar:hover,
+#alternar-tema:hover {
+    background-color: var(--azul-hover);
+}
+
+button {
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: 3px;
+}
+
+button:active {
+    transform: scale(0.96);
+}
