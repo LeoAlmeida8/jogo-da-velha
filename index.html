@@ -6,6 +6,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Jogo da Velha</title>
+    <meta name="theme-color" content="#070b18">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -16,48 +21,64 @@
         <!-- Mostra de quem é a vez ou quem venceu -->
         <p id="mensagem" aria-live="polite">Vez de X</p>
 
-        <!-- Seleção entre dois jogadores ou contra o computador -->
-        <div class="configuracao-modo">
-            <label for="modo">Modo de jogo:</label>
-            <select id="modo">
-                <option value="humano">Humano vs Humano</option>
-                <option value="computador" selected>Humano vs Computador</option>
-                <option value="online">Modo Online</option>
-            </select>
-        </div>
+        <details class="menu-opcoes">
+            <summary>Opções</summary>
+            <div class="opcoes-conteudo">
+                <!-- Seleção entre dois jogadores ou contra o computador -->
+                <div class="configuracao-modo">
+                    <label for="modo">Modo de jogo:</label>
+                    <select id="modo">
+                        <option value="humano">Humano vs Humano</option>
+                        <option value="computador" selected>Humano vs Computador</option>
+                        <option value="online">Modo Online</option>
+                    </select>
+                </div>
 
-        <section id="controles-online" hidden>
-            <h2>Partida online</h2>
+                <section id="controles-online" hidden>
+                    <h2>Partida online</h2>
+                    <button id="criar-sala" type="button">Criar sala</button>
+                    <label for="codigo-sala">Código da sala</label>
+                    <div class="codigo-sala-linha">
+                        <input id="codigo-sala" type="text" maxlength="6" placeholder="Digite o código" autocomplete="off">
+                        <button id="copiar-codigo" type="button">Copiar</button>
+                    </div>
+                    <button id="entrar-sala" type="button">Entrar na sala</button>
+                    <button id="sair-sala" type="button">Sair da sala</button>
+                    <p id="status-sala" aria-live="polite"></p>
+                </section>
 
-            <button id="criar-sala" type="button">Criar sala</button>
+                <!-- Escolha da dificuldade da IA -->
+                <div class="configuracao-dificuldade">
+                    <label for="dificuldade">Dificuldade do computador:</label>
+                    <select id="dificuldade">
+                        <option value="facil">Fácil</option>
+                        <option value="medio" selected>Médio</option>
+                        <option value="dificil">Difícil</option>
+                    </select>
+                </div>
 
-            <label for="codigo-sala">Código da sala</label>
-            <div class="codigo-sala-linha">
-                <input
-                    id="codigo-sala"
-                    type="text"
-                    maxlength="6"
-                    placeholder="Digite o código"
-                    autocomplete="off"
-                >
-                <button id="copiar-codigo" type="button">Copiar</button>
+                <!-- Controles de música e efeitos com volumes independentes -->
+                <section class="configuracao-audio" aria-labelledby="titulo-audio">
+                    <h2 id="titulo-audio">Áudio</h2>
+                    <label class="audio-alternancia" for="musica-ativada">
+                        <input id="musica-ativada" type="checkbox">
+                        <span>Música de fundo</span>
+                    </label>
+                    <label class="audio-volume" for="volume-musica">
+                        <span>Volume da música <output id="volume-musica-valor" for="volume-musica">30%</output></span>
+                        <input id="volume-musica" type="range" min="0" max="100" value="30">
+                    </label>
+                    <label class="audio-alternancia" for="efeitos-ativados">
+                        <input id="efeitos-ativados" type="checkbox">
+                        <span>Efeitos sonoros</span>
+                    </label>
+                    <label class="audio-volume" for="volume-efeitos">
+                        <span>Volume dos efeitos <output id="volume-efeitos-valor" for="volume-efeitos">70%</output></span>
+                        <input id="volume-efeitos" type="range" min="0" max="100" value="70">
+                    </label>
+                </section>
             </div>
-            <button id="entrar-sala" type="button">Entrar na sala</button>
-            <button id="sair-sala" type="button">Sair da sala</button>
-
-            <p id="status-sala" aria-live="polite"></p>
-        </section>
-
-        <!-- Escolha da dificuldade da IA -->
-        <div class="configuracao-dificuldade">
-            <label for="dificuldade">Dificuldade do computador:</label>
-            <select id="dificuldade">
-                <option value="facil">Fácil</option>
-                <option value="medio" selected>Médio</option>
-                <option value="dificil">Difícil</option>
-            </select>
-        </div>
-
+        </details>
         <!-- Placar da partida -->
         <p id="placar">X: 0 | O: 0 | Empates: 0</p>
 
@@ -81,6 +102,16 @@
     </main>
 
     <script type="module" src="script.js"></script>
+    <script>
+        // Registra o service worker para permitir a experiência instalável e o cache básico do app.
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker.register("/service-worker.js").catch(function (erro) {
+                    console.error("Não foi possível registrar o service worker:", erro);
+                });
+            });
+        }
+    </script>
 </body>
 
 </html>

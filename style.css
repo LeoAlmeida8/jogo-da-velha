@@ -102,6 +102,93 @@ h1 {
     background: rgba(5, 12, 28, 0.45);
 }
 
+.menu-opcoes {
+    margin: 8px 0 14px;
+    border: 1px solid rgba(0, 245, 255, 0.34);
+    border-radius: 14px;
+    text-align: left;
+    background: rgba(5, 12, 28, 0.42);
+    box-shadow: inset 0 0 16px rgba(0, 245, 255, 0.04);
+}
+
+.menu-opcoes summary {
+    position: relative;
+    padding: 12px 42px 12px 15px;
+    color: var(--azul);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+}
+
+.menu-opcoes summary::-webkit-details-marker { display: none; }
+.menu-opcoes summary::after {
+    content: "+";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--azul);
+    font-size: 1.35rem;
+}
+.menu-opcoes[open] summary::after { content: "−"; }
+.menu-opcoes summary:focus-visible {
+    outline: 3px solid var(--verde-borda);
+    outline-offset: 3px;
+    border-radius: 12px;
+}
+
+.opcoes-conteudo {
+    display: grid;
+    gap: 8px;
+    padding: 0 14px 14px;
+}
+
+.configuracao-audio {
+    display: grid;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0, 245, 255, 0.2);
+}
+
+.configuracao-audio h2 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--texto);
+}
+
+.audio-alternancia,
+.audio-volume > span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--texto);
+    font-size: 0.9rem;
+}
+
+.audio-alternancia input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--azul);
+}
+
+.audio-volume > span {
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.audio-volume output {
+    color: var(--azul);
+    font-variant-numeric: tabular-nums;
+}
+
+.audio-volume input[type="range"] {
+    width: 100%;
+    margin: 0;
+    accent-color: var(--azul);
+    cursor: pointer;
+}
 .configuracao-modo,
 .configuracao-dificuldade {
     display: flex;
@@ -148,8 +235,10 @@ h1 {
 
 .acoes {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(100%, 310px);
+    align-self: center;
+    gap: 8px;
     margin-top: auto;
 }
 
@@ -221,7 +310,8 @@ select {
 }
 
 button:focus-visible,
-select:focus-visible {
+select:focus-visible,
+input:focus-visible {
     outline: 3px solid var(--verde-borda);
     outline-offset: 3px;
 }
@@ -300,6 +390,14 @@ button:active {
         font-size: 0.9rem;
     }
 
+    .opcoes-conteudo {
+        gap: 5px;
+        padding: 0 10px 11px;
+    }
+
+    .menu-opcoes {
+        margin: 6px 0 10px;
+    }
     #controles-online {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 7px;
@@ -373,7 +471,7 @@ button:active {
     }
 
     .acoes {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: min(100%, 310px);
         gap: 8px;
         margin-top: 4px;
     }

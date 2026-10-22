@@ -65,7 +65,291 @@ const botaoSairSala = document.querySelector("#sair-sala");
 const botaoCopiarCodigo = document.querySelector("#copiar-codigo");
 const campoCodigoSala = document.querySelector("#codigo-sala");
 const statusSala = document.querySelector("#status-sala");
+const controleMusica = document.querySelector("#musica-ativada");
+const volumeMusicaControle = document.querySelector("#volume-musica");
+const volumeMusicaValor = document.querySelector("#volume-musica-valor");
+const controleEfeitos = document.querySelector("#efeitos-ativados");
+const volumeEfeitosControle = document.querySelector("#volume-efeitos");
+const volumeEfeitosValor = document.querySelector("#volume-efeitos-valor");
 
+// Mantém as preferências de áudio entre visitas. A chave antiga também é respeitada.
+const somAntigoDesligado = localStorage.getItem("somJogoDaVelha") === "desligado";
+let musicaAtiva = localStorage.getItem("musicaJogoDaVelha") !== "desligado" && !somAntigoDesligado;
+let efeitosAtivos = localStorage.getItem("efeitosJogoDaVelha") !== "desligado" && !somAntigoDesligado;
+localStorage.removeItem("somJogoDaVelha"); // A partir daqui, cada controle é salvo separadamente.
+let contextoAudio = null;
+let ganhoMusica = null;
+let ganhoEfeitos = null;
+let intervaloMelodia = null;
+let indiceMelodia = 0;
+let repeticaoMelodia = 0;
+let bufferRuidoMusical = null;
+
+const volumeMusicaSalvo = Number(localStorage.getItem("volumeMusicaJogoDaVelha"));
+const volumeEfeitosSalvo = Number(localStorage.getItem("volumeEfeitosJogoDaVelha"));
+volumeMusicaControle.value = Number.isFinite(volumeMusicaSalvo) && localStorage.getItem("volumeMusicaJogoDaVelha") !== null
+    ? String(Math.max(0, Math.min(100, volumeMusicaSalvo)))
+    : "30";
+volumeEfeitosControle.value = Number.isFinite(volumeEfeitosSalvo) && localStorage.getItem("volumeEfeitosJogoDaVelha") !== null
+    ? String(Math.max(0, Math.min(100, volumeEfeitosSalvo)))
+    : "70";
+controleMusica.checked = musicaAtiva;
+controleEfeitos.checked = efeitosAtivos;
+
+function atualizarRotulosVolume() {
+    volumeMusicaValor.value = `${volumeMusicaControle.value}%`;
+    volumeEfeitosValor.value = `${volumeEfeitosControle.value}%`;
+}
+
+function atualizarVolumeMusica() {
+    if (ganhoMusica && contextoAudio) {
+        const volume = musicaAtiva ? Number(volumeMusicaControle.value) / 100 * 0.55 : 0;
+        ganhoMusica.gain.setTargetAtTime(volume, contextoAudio.currentTime, 0.08);
+    }
+}
+
+function atualizarVolumeEfeitos() {
+    if (ganhoEfeitos && contextoAudio) {
+        const volume = efeitosAtivos ? Number(volumeEfeitosControle.value) / 100 : 0;
+        ganhoEfeitos.gain.setTargetAtTime(volume, contextoAudio.currentTime, 0.04);
+    }
+}
+
+function iniciarMusicaDeFundo() {
+    if (!contextoAudio || contextoAudio.state !== "running" || !musicaAtiva || intervaloMelodia !== null) return;
+
+    atualizarVolumeMusica();
+
+    // Trilha original de arcade: quatro frases que variam em um ciclo de oito segundos.
+    const frases = [
+        [659.25, null, 783.99, 880, 987.77, null, 880, null, 783.99, null, 659.25, 587.33, 659.25, null, 783.99, null],
+        [880, null, 987.77, null, 1174.66, 987.77, 880, null, 783.99, null, 880, 987.77, 1046.5, 987.77, 880, null],
+        [659.25, null, 783.99, 987.77, 880, null, 783.99, null, 659.25, null, 587.33, 659.25, 783.99, 880, 987.77, null],
+        [1046.5, 987.77, 880, 783.99, null, 880, 987.77, null, 1174.66, null, 1046.5, 987.77, 880, 783.99, 659.25, null]
+    ];
+    const fraseAlternativa = [
+        1174.66, null, 1046.5, 987.77, 880, null, 783.99, 880,
+        987.77, null, 1174.66, 1318.51, 1174.66, 987.77, 880, 659.25
+    ];
+    const acordes = [
+        { raiz: 110, quinta: 164.81, notas: [220, 277.18, 329.63] },
+        { raiz: 92.5, quinta: 138.59, notas: [185, 220, 277.18] },
+        { raiz: 73.42, quinta: 110, notas: [146.83, 185, 220] },
+        { raiz: 82.41, quinta: 123.47, notas: [164.81, 207.65, 246.94] }
+    ];
+
+    function tocarNotaMusical(frequencia, inicio, duracao, forma, volume) {
+        const oscilador = contextoAudio.createOscillator();
+        const envelope = contextoAudio.createGain();
+        oscilador.type = forma;
+        oscilador.frequency.setValueAtTime(frequencia, inicio);
+        envelope.gain.setValueAtTime(0.0001, inicio);
+        envelope.gain.exponentialRampToValueAtTime(volume, inicio + 0.008);
+        envelope.gain.setValueAtTime(volume, inicio + duracao * 0.52);
+        envelope.gain.exponentialRampToValueAtTime(0.0001, inicio + duracao);
+        oscilador.connect(envelope);
+        envelope.connect(ganhoMusica);
+        oscilador.start(inicio);
+        oscilador.stop(inicio + duracao + 0.01);
+    }
+
+    function tocarRuidoMusical(inicio, duracao, volume, frequenciaFiltro, tipoFiltro) {
+        if (!bufferRuidoMusical) {
+            const tamanho = Math.ceil(contextoAudio.sampleRate * 0.25);
+            bufferRuidoMusical = contextoAudio.createBuffer(1, tamanho, contextoAudio.sampleRate);
+            const dados = bufferRuidoMusical.getChannelData(0);
+            for (let i = 0; i < tamanho; i++) dados[i] = Math.random() * 2 - 1;
+        }
+
+        const ruido = contextoAudio.createBufferSource();
+        const filtro = contextoAudio.createBiquadFilter();
+        const envelope = contextoAudio.createGain();
+        ruido.buffer = bufferRuidoMusical;
+        filtro.type = tipoFiltro;
+        filtro.frequency.value = frequenciaFiltro;
+        envelope.gain.setValueAtTime(volume, inicio);
+        envelope.gain.exponentialRampToValueAtTime(0.0001, inicio + duracao);
+        ruido.connect(filtro);
+        filtro.connect(envelope);
+        envelope.connect(ganhoMusica);
+        ruido.start(inicio);
+        ruido.stop(inicio + duracao + 0.01);
+    }
+
+    function tocarBateria(inicio, posicao) {
+        if (posicao === 0 || posicao === 8) {
+            const bumbo = contextoAudio.createOscillator();
+            const envelope = contextoAudio.createGain();
+            bumbo.type = "sine";
+            bumbo.frequency.setValueAtTime(125, inicio);
+            bumbo.frequency.exponentialRampToValueAtTime(48, inicio + 0.13);
+            envelope.gain.setValueAtTime(0.13, inicio);
+            envelope.gain.exponentialRampToValueAtTime(0.0001, inicio + 0.15);
+            bumbo.connect(envelope);
+            envelope.connect(ganhoMusica);
+            bumbo.start(inicio);
+            bumbo.stop(inicio + 0.16);
+        }
+
+        if (posicao === 4 || posicao === 12) {
+            tocarRuidoMusical(inicio, 0.11, 0.035, 1800, "bandpass");
+        } else if (posicao % 2 === 0) {
+            tocarRuidoMusical(inicio, 0.035, 0.009, 6500, "highpass");
+        }
+    }
+
+    function tocarNotaAmbiente() {
+        if (!musicaAtiva || !contextoAudio || !ganhoMusica) return;
+
+        const inicio = contextoAudio.currentTime;
+        const passo = indiceMelodia % 64;
+        const compasso = Math.floor(passo / 16);
+        const posicao = passo % 16;
+        const acorde = acordes[compasso];
+        const fraseAtual = compasso === 3 && repeticaoMelodia % 2 === 1
+            ? fraseAlternativa
+            : frases[compasso];
+        const nota = fraseAtual[posicao];
+
+        if (nota) {
+            const formaMelodia = posicao % 4 === 0 ? "square" : "triangle";
+            tocarNotaMusical(nota, inicio, 0.105, formaMelodia, 0.13);
+        }
+
+        // Baixo, acordes e bateria dão pulso sem deixar a melodia pesada.
+        if (posicao % 4 === 0) {
+            const frequenciaBaixa = posicao === 4 || posicao === 12 ? acorde.quinta : acorde.raiz;
+            tocarNotaMusical(frequenciaBaixa, inicio, 0.19, "triangle", 0.11);
+            tocarBateria(inicio, posicao);
+        } else if (posicao % 2 === 0) {
+            tocarBateria(inicio, posicao);
+        }
+
+        if (posicao === 0 || posicao === 8) {
+            acorde.notas.forEach(function (frequencia) {
+                tocarNotaMusical(frequencia, inicio, 0.28, "triangle", 0.025);
+            });
+        }
+
+        if (indiceMelodia === 63) repeticaoMelodia++;
+        indiceMelodia = (indiceMelodia + 1) % 64;
+    }
+
+    indiceMelodia = 0;
+    tocarNotaAmbiente();
+    intervaloMelodia = window.setInterval(tocarNotaAmbiente, 125);
+}
+
+function pararMusicaDeFundo() {
+    if (intervaloMelodia !== null) {
+        window.clearInterval(intervaloMelodia);
+        intervaloMelodia = null;
+    }
+
+    if (contextoAudio && ganhoMusica) {
+        ganhoMusica.gain.setTargetAtTime(0, contextoAudio.currentTime, 0.04);
+    }
+
+
+}
+
+// O navegador só libera áudio depois de uma interação explícita da pessoa.
+function prepararAudio() {
+    const AudioContexto = window.AudioContext || window.webkitAudioContext;
+    if ((!musicaAtiva && !efeitosAtivos) || !AudioContexto) return;
+
+    try {
+        if (!contextoAudio) {
+            contextoAudio = new AudioContexto();
+            ganhoMusica = contextoAudio.createGain();
+            ganhoEfeitos = contextoAudio.createGain();
+            ganhoMusica.connect(contextoAudio.destination);
+            ganhoEfeitos.connect(contextoAudio.destination);
+            atualizarVolumeMusica();
+            atualizarVolumeEfeitos();
+        }
+
+        const pronto = contextoAudio.state === "suspended" ? contextoAudio.resume() : Promise.resolve();
+        pronto.then(function () {
+            if (musicaAtiva) iniciarMusicaDeFundo();
+        }).catch(function () {});
+    } catch (erro) {
+        console.warn("O áudio não está disponível neste navegador.", erro);
+    }
+}
+
+document.addEventListener("pointerdown", prepararAudio, { once: true, capture: true });
+document.addEventListener("keydown", prepararAudio, { once: true, capture: true });
+
+function tocarNota(frequenciaInicial, frequenciaFinal, atraso, duracao, forma, volume) {
+    if (!efeitosAtivos || !contextoAudio || !ganhoEfeitos || Number(volumeEfeitosControle.value) === 0) return;
+
+    const tocar = function () {
+        const inicio = contextoAudio.currentTime + atraso;
+        const oscilador = contextoAudio.createOscillator();
+        const volumeAudio = contextoAudio.createGain();
+        oscilador.type = forma;
+        oscilador.frequency.setValueAtTime(frequenciaInicial, inicio);
+        oscilador.frequency.exponentialRampToValueAtTime(frequenciaFinal, inicio + duracao);
+        volumeAudio.gain.setValueAtTime(0.0001, inicio);
+        volumeAudio.gain.exponentialRampToValueAtTime(volume, inicio + 0.012);
+        volumeAudio.gain.exponentialRampToValueAtTime(0.0001, inicio + duracao);
+        oscilador.connect(volumeAudio);
+        volumeAudio.connect(ganhoEfeitos);
+        oscilador.start(inicio);
+        oscilador.stop(inicio + duracao + 0.02);
+    };
+
+    if (contextoAudio.state === "suspended") contextoAudio.resume().then(tocar).catch(function () {});
+    else tocar();
+}
+
+function tocarSomJogada() {
+    tocarNota(620, 880, 0, 0.09, "triangle", 0.08);
+    tocarNota(880, 1120, 0.045, 0.08, "sine", 0.045);
+}
+
+function tocarSomVitoria(atrasoInicial) {
+    [523.25, 659.25, 783.99, 1046.5].forEach(function (frequencia, indice) {
+        tocarNota(frequencia, frequencia * 1.04, atrasoInicial + indice * 0.11, 0.18, "triangle", 0.09);
+    });
+}
+
+function tocarSomEmpate() {
+    tocarNota(440, 392, 0, 0.2, "sine", 0.07);
+    tocarNota(330, 294, 0.16, 0.24, "sine", 0.06);
+}
+
+controleMusica.addEventListener("change", function () {
+    musicaAtiva = controleMusica.checked;
+    localStorage.setItem("musicaJogoDaVelha", musicaAtiva ? "ligado" : "desligado");
+    if (musicaAtiva) prepararAudio();
+    else pararMusicaDeFundo();
+});
+
+controleEfeitos.addEventListener("change", function () {
+    efeitosAtivos = controleEfeitos.checked;
+    localStorage.setItem("efeitosJogoDaVelha", efeitosAtivos ? "ligado" : "desligado");
+    atualizarVolumeEfeitos();
+    if (efeitosAtivos) prepararAudio();
+});
+
+volumeMusicaControle.addEventListener("input", function () {
+    atualizarRotulosVolume();
+    localStorage.setItem("volumeMusicaJogoDaVelha", volumeMusicaControle.value);
+    if (Number(volumeMusicaControle.value) > 0 && musicaAtiva) prepararAudio();
+    else if (Number(volumeMusicaControle.value) === 0) pararMusicaDeFundo();
+    atualizarVolumeMusica();
+});
+
+volumeEfeitosControle.addEventListener("input", function () {
+    atualizarRotulosVolume();
+    localStorage.setItem("volumeEfeitosJogoDaVelha", volumeEfeitosControle.value);
+    if (Number(volumeEfeitosControle.value) > 0 && efeitosAtivos) prepararAudio();
+    atualizarVolumeEfeitos();
+});
+
+atualizarRotulosVolume();
 botaoCopiarCodigo.addEventListener("click", async function () {
     if (!codigoSalaAtual) {
         statusSala.textContent = "Crie ou entre em uma sala antes de copiar o código.";
@@ -117,6 +401,7 @@ function ouvirSala(codigo) {
         pararDeOuvirSala();
     }
 
+    let primeiraLeituraDaSala = true;
     pararDeOuvirSala = onValue(ref(database, "salas/" + codigo), function (snapshot) {
         const sala = snapshot.val();
 
@@ -138,6 +423,9 @@ function ouvirSala(codigo) {
             `X: ${placarOnline.X} | O: ${placarOnline.O} | Empates: ${placarOnline.empates}`;
 
         const tabuleiro = partida.tabuleiro || [];
+        const tabuleiroAnterior = Array.from(casas).map(function (casa) {
+            return casa.textContent;
+        });
 
         // Copia os símbolos recebidos do Firebase para as nove casas da página.
         casas.forEach(function (casa, indice) {
@@ -153,6 +441,23 @@ function ouvirSala(codigo) {
             casa.classList.toggle("jogada-o", simbolo === "O");
             casa.classList.remove("vencedora");
         });
+
+        if (!primeiraLeituraDaSala) {
+            const houveNovaJogada = tabuleiro.some(function (simbolo, indice) {
+                return simbolo && simbolo !== tabuleiroAnterior[indice];
+            });
+
+            if (houveNovaJogada) {
+                tocarSomJogada();
+
+                if (partida.status === "encerrada") {
+                    tocarSomVitoria(0.12);
+                } else if (partida.status === "empate") {
+                    setTimeout(tocarSomEmpate, 120);
+                }
+            }
+        }
+        primeiraLeituraDaSala = false;
 
         jogadorAtual = partida.jogadorAtual || "X";
         jogoEncerrado = partida.status === "encerrada" || partida.status === "empate";
@@ -600,6 +905,7 @@ casas.forEach(function (casa) {
         }
 
         casa.textContent = jogadorAtual;
+        tocarSomJogada();
 
         const numeroDaCasa = Number(casa.dataset.index) + 1;
         casa.setAttribute("aria-label", `Casa ${numeroDaCasa}: ${jogadorAtual}`);
@@ -608,6 +914,7 @@ casas.forEach(function (casa) {
         const combinacaoVencedora = verificarVitoria();
 
         if (combinacaoVencedora) {
+            tocarSomVitoria(0.12);
             pontuacao[jogadorAtual]++;
             atualizarPlacar();
             mensagem.textContent = `Jogador ${jogadorAtual} venceu!`;
@@ -625,6 +932,7 @@ casas.forEach(function (casa) {
         });
 
         if (todasCasasPreenchidas) {
+            tocarSomEmpate();
             pontuacao.empates++;
             atualizarPlacar();
             mensagem.textContent = "Empate!";
