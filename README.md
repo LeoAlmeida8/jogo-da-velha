@@ -1,28 +1,63 @@
 # Jogo da Velha
 
-Um jogo da velha para navegador, criado para praticar HTML, CSS e JavaScript. É possível jogar contra outra pessoa no mesmo dispositivo ou enfrentar o computador.
+Jogo da velha feito com HTML, CSS e JavaScript. Inclui partidas locais, uma inteligência artificial e partidas online sincronizadas pelo Firebase Realtime Database.
 
-## Como jogar
+## Acessar o jogo
 
-Abra o arquivo `index.html` em um navegador. Escolha o modo de jogo e, quando jogar contra o computador, selecione o nível de dificuldade. Clique em uma casa para fazer sua jogada.
-
-Use **Reiniciar** para começar uma nova partida. O placar pode ser zerado pelo botão **Zerar placar**.
+[Jogar no Firebase Hosting](https://jogo-da-velha-online-a0599.web.app)
 
 ## Recursos
 
-- Modo humano contra humano
-- Modo humano contra computador com níveis fácil, médio e difícil
-- Detecção de vitória e empate
-- Destaque das casas da combinação vencedora
-- Placar salvo no navegador
-- Layout responsivo com visual cyberpunk e painel em formato vertical, inspirado em uma tela de celular
+- **Humano vs Humano:** duas pessoas jogam no mesmo dispositivo.
+- **Humano vs Computador:** escolha entre os níveis fácil, médio e difícil.
+- **Modo Online:** crie uma sala e compartilhe o código, ou entre usando o código de outra pessoa.
+- **Sincronização em tempo real:** jogadas, vez atual, vitória e placar são compartilhados pela sala.
+- **Controles da sala:** copie o código, reinicie a rodada ou zere o placar compartilhado.
+- **Sair da sala:** O pode liberar a vaga; se X sair, a sala é encerrada.
+- **Layout responsivo:** a interface se ajusta a telas de celular.
+- **Tema cyberpunk:** cores neon e painel com efeito acrílico.
 
 ## Arquivos
 
-- `index.html`: estrutura da página
-- `style.css`: aparência e layout
-- `script.js`: regras do jogo e interações
+- `index.html` — estrutura da página e controles.
+- `style.css` — aparência e layout responsivo.
+- `script.js` — regras do jogo, IA e conexão com Firebase.
+- `firebase.json` e `.firebaserc` — configuração do Firebase Hosting.
+
+## Executar localmente
+
+1. Abra a pasta do projeto no Visual Studio Code.
+2. Inicie um servidor local, por exemplo com a extensão **Live Server**.
+3. Abra o endereço local indicado pelo servidor, como `http://127.0.0.1:5500`.
+
+O jogo usa módulos JavaScript e Firebase; por isso, abra a página por um servidor HTTP/HTTPS, não diretamente pelo arquivo `index.html`.
+
+## Configuração do Firebase
+
+O projeto usa o Firebase Authentication com login anônimo e o Realtime Database para salas online. Para usar outro projeto Firebase:
+
+1. Crie um app Web no Firebase e habilite o login anônimo.
+2. Crie um Realtime Database.
+3. Atualize `firebaseConfig` em `script.js` com os dados do seu app e a URL do banco.
+4. Configure regras do Realtime Database que permitam acesso somente aos jogadores autenticados que pertencem à sala.
+
+Não use regras públicas como `".read": true` ou `".write": true`.
+
+## Publicar atualizações
+
+O projeto está associado ao Firebase `jogo-da-velha-online-a0599`. Depois de editar os arquivos, abra o terminal na pasta do projeto e execute:
+
+```powershell
+firebase deploy --only hosting
+```
+
+O comando publica o conteúdo configurado para Hosting. Ele não publica as regras do Realtime Database.
 
 ## Tecnologias
 
-HTML, CSS e JavaScript, sem bibliotecas externas.
+- HTML5
+- CSS3
+- JavaScript (ES modules)
+- Firebase Authentication
+- Firebase Realtime Database
+- Firebase Hosting

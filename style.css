@@ -15,6 +15,32 @@
     box-sizing: border-box;
 }
 
+[hidden] {
+    display: none !important;
+}
+
+#controles-online {
+    display: grid;
+    gap: 10px;
+    margin: 16px 0;
+    text-align: left;
+}
+
+#controles-online h2 {
+    margin: 0;
+    text-align: center;
+}
+
+.codigo-sala-linha {
+    display: flex;
+    gap: 8px;
+}
+
+.codigo-sala-linha #codigo-sala {
+    flex: 1;
+    min-width: 0;
+}
+
 body {
     min-height: 100vh;
     margin: 0;
@@ -151,7 +177,11 @@ h1 {
 }
 
 #reiniciar,
-#zerar-placar {
+#zerar-placar,
+#criar-sala,
+#entrar-sala,
+#sair-sala,
+#copiar-codigo {
     width: 100%;
     min-height: 48px;
     margin: 0;
@@ -167,10 +197,21 @@ h1 {
 }
 
 #reiniciar:hover,
-#zerar-placar:hover {
+#zerar-placar:hover,
+#criar-sala:hover,
+#entrar-sala:hover,
+#sair-sala:hover,
+#copiar-codigo:hover {
     color: white;
     background: linear-gradient(110deg, #a92585, var(--azul-hover));
     box-shadow: 0 0 18px rgba(255, 56, 184, 0.35);
+}
+
+#copiar-codigo {
+    width: auto;
+    min-width: 88px;
+    padding-right: 12px;
+    padding-left: 12px;
 }
 
 button,
@@ -189,23 +230,177 @@ button:active {
     transform: scale(0.97);
 }
 
+#codigo-sala {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px;
+    border: 1px solid rgba(0, 245, 255, 0.65);
+    border-radius: 10px;
+    color: var(--texto);
+    background-color: var(--casa);
+    font-size: 1rem;
+    box-shadow: inset 0 0 12px rgba(0, 245, 255, 0.08);
+}
+
+#codigo-sala::placeholder {
+    color: rgba(232, 251, 255, 0.6);
+}
+
+#codigo-sala:focus-visible {
+    outline: 3px solid var(--verde-borda);
+    outline-offset: 2px;
+}
+
 @media (max-width: 480px) {
     body {
-        padding: 14px;
+        min-height: 100dvh;
+        padding: 8px;
+        display: flex;
+        align-items: flex-start;
     }
 
     .cartao-app {
-        padding: 22px 18px;
+        width: min(100%, 390px);
+        min-height: 0;
+        margin: 0 auto;
+        padding: 14px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        margin-bottom: 4px;
+        font-size: clamp(1.6rem, 8vw, 2rem);
+        line-height: 1.05;
+    }
+
+    #mensagem {
+        min-height: 1.2em;
+        margin: 8px 0;
+        font-size: 1rem;
     }
 
     .configuracao-modo,
     .configuracao-dificuldade {
-        align-items: stretch;
-        flex-direction: column;
-        gap: 6px;
+        align-items: center;
+        flex-direction: row;
+        gap: 8px;
+        margin: 8px 0;
+    }
+
+    .configuracao-modo label,
+    .configuracao-dificuldade label {
+        flex: 1;
+        font-size: 0.9rem;
+    }
+
+    #modo,
+    #dificuldade {
+        width: 58%;
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    #controles-online {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+        margin: 8px 0;
+    }
+
+    #controles-online h2,
+    #controles-online label,
+    .codigo-sala-linha,
+    #status-sala {
+        grid-column: 1 / -1;
+    }
+
+    #controles-online h2 {
+        font-size: 1.15rem;
+    }
+
+    #criar-sala {
+        grid-column: 1;
+    }
+
+    #entrar-sala {
+        grid-column: 1;
+    }
+
+    #sair-sala {
+        grid-column: 2;
+    }
+
+    #status-sala {
+        margin: 2px 0;
+        font-size: 0.88rem;
+    }
+
+    #criar-sala,
+    #entrar-sala,
+    #sair-sala,
+    #copiar-codigo,
+    #reiniciar,
+    #zerar-placar {
+        min-height: 42px;
+        padding: 8px 10px;
+        font-size: 0.88rem;
+    }
+
+    #copiar-codigo {
+        min-width: 76px;
+    }
+
+    #codigo-sala {
+        min-height: 42px;
+        padding: 9px;
+        font-size: 0.95rem;
+    }
+
+    #placar {
+        margin: 5px 0;
+        padding: 7px 10px;
+        font-size: 0.9rem;
+    }
+
+    .tabuleiro {
+        width: min(100%, 290px);
+        gap: 7px;
+        margin: 12px auto;
+    }
+
+    .tabuleiro button {
+        border-radius: 11px;
+        font-size: clamp(2rem, 10vw, 2.7rem);
+    }
+
+    .acoes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 4px;
     }
 }
 
+@media (max-width: 380px), (max-height: 700px) and (max-width: 480px) {
+    body {
+        padding: 6px;
+    }
 
+    .cartao-app {
+        padding: 11px;
+    }
 
+    #mensagem {
+        margin: 5px 0;
+    }
+
+    .tabuleiro {
+        width: min(100%, 250px);
+        gap: 5px;
+        margin: 8px auto;
+    }
+
+    #controles-online {
+        gap: 5px;
+        margin: 5px 0;
+    }
+}
 

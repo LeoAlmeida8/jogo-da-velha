@@ -22,8 +22,31 @@
             <select id="modo">
                 <option value="humano">Humano vs Humano</option>
                 <option value="computador" selected>Humano vs Computador</option>
+                <option value="online">Modo Online</option>
             </select>
         </div>
+
+        <section id="controles-online" hidden>
+            <h2>Partida online</h2>
+
+            <button id="criar-sala" type="button">Criar sala</button>
+
+            <label for="codigo-sala">Código da sala</label>
+            <div class="codigo-sala-linha">
+                <input
+                    id="codigo-sala"
+                    type="text"
+                    maxlength="6"
+                    placeholder="Digite o código"
+                    autocomplete="off"
+                >
+                <button id="copiar-codigo" type="button">Copiar</button>
+            </div>
+            <button id="entrar-sala" type="button">Entrar na sala</button>
+            <button id="sair-sala" type="button">Sair da sala</button>
+
+            <p id="status-sala" aria-live="polite"></p>
+        </section>
 
         <!-- Escolha da dificuldade da IA -->
         <div class="configuracao-dificuldade">
@@ -57,7 +80,7 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>
