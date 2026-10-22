@@ -1,4 +1,4 @@
-const CACHE_NAME = "jogo-da-velha-v6";
+const CACHE_NAME = "jogo-da-velha-v10";
 const APP_FILES = [
     "/",
     "/index.html",

@@ -65,6 +65,17 @@ const botaoSairSala = document.querySelector("#sair-sala");
 const botaoCopiarCodigo = document.querySelector("#copiar-codigo");
 const campoCodigoSala = document.querySelector("#codigo-sala");
 const statusSala = document.querySelector("#status-sala");
+
+// Envolve X e O em um elemento próprio para animar o símbolo sem mover a casa.
+function mostrarSimbolo(casa, simbolo) {
+    casa.textContent = "";
+    if (!simbolo) return;
+
+    const elementoSimbolo = document.createElement("span");
+    elementoSimbolo.className = "simbolo";
+    elementoSimbolo.textContent = simbolo;
+    casa.appendChild(elementoSimbolo);
+}
 const controleMusica = document.querySelector("#musica-ativada");
 const volumeMusicaControle = document.querySelector("#volume-musica");
 const volumeMusicaValor = document.querySelector("#volume-musica-valor");
@@ -432,7 +443,7 @@ function ouvirSala(codigo) {
             const simbolo = tabuleiro[indice] || "";
             const numeroDaCasa = indice + 1;
 
-            casa.textContent = simbolo;
+            mostrarSimbolo(casa, simbolo);
             casa.setAttribute(
                 "aria-label",
                 simbolo ? `Casa ${numeroDaCasa}: ${simbolo}` : `Casa ${numeroDaCasa}`
@@ -904,7 +915,7 @@ casas.forEach(function (casa) {
             return;
         }
 
-        casa.textContent = jogadorAtual;
+        mostrarSimbolo(casa, jogadorAtual);
         tocarSomJogada();
 
         const numeroDaCasa = Number(casa.dataset.index) + 1;
