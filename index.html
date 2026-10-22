@@ -6,40 +6,56 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Jogo da Velha</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h1>Jogo da Velha</h1>
+    <main class="cartao-app">
+        <h1>Jogo da Velha</h1>
 
-    <!-- Mostra de quem é a vez ou quem venceu -->
-    <p id="mensagem" aria-live="polite">Vez de X</p>
+        <!-- Mostra de quem é a vez ou quem venceu -->
+        <p id="mensagem" aria-live="polite">Vez de X</p>
 
-    <!-- Mostra o placar -->
-    <p id="placar">X: 0 | O: 0 | Empates: 0</p>
+        <!-- Seleção entre dois jogadores ou contra o computador -->
+        <div class="configuracao-modo">
+            <label for="modo">Modo de jogo:</label>
+            <select id="modo">
+                <option value="humano">Humano vs Humano</option>
+                <option value="computador" selected>Humano vs Computador</option>
+            </select>
+        </div>
 
-    <!-- As nove casas do tabuleiro -->
-    <div class="tabuleiro">
-        <button class="casa" data-index="0" aria-label="Casa 1" type="button"></button>
-        <button class="casa" data-index="1" aria-label="Casa 2" type="button"></button>
-        <button class="casa" data-index="2" aria-label="Casa 3" type="button"></button>
-        <button class="casa" data-index="3" aria-label="Casa 4" type="button"></button>
-        <button class="casa" data-index="4" aria-label="Casa 5" type="button"></button>
-        <button class="casa" data-index="5" aria-label="Casa 6" type="button"></button>
-        <button class="casa" data-index="6" aria-label="Casa 7" type="button"></button>
-        <button class="casa" data-index="7" aria-label="Casa 8" type="button"></button>
-        <button class="casa" data-index="8" aria-label="Casa 9" type="button"></button>
-    </div>
+        <!-- Escolha da dificuldade da IA -->
+        <div class="configuracao-dificuldade">
+            <label for="dificuldade">Dificuldade do computador:</label>
+            <select id="dificuldade">
+                <option value="facil">Fácil</option>
+                <option value="medio" selected>Médio</option>
+                <option value="dificil">Difícil</option>
+            </select>
+        </div>
 
-    <!-- Botão para jogar outra partida -->
-    <button id="reiniciar" type="button">Reiniciar</button>
+        <!-- Placar da partida -->
+        <p id="placar">X: 0 | O: 0 | Empates: 0</p>
 
-    <!-- Botão para apagar o placar -->
-    <button id="zerar-placar" type="button">Zerar placar</button>
+        <!-- As nove casas do tabuleiro -->
+        <div class="tabuleiro">
+            <button class="casa" data-index="0" aria-label="Casa 1" type="button"></button>
+            <button class="casa" data-index="1" aria-label="Casa 2" type="button"></button>
+            <button class="casa" data-index="2" aria-label="Casa 3" type="button"></button>
+            <button class="casa" data-index="3" aria-label="Casa 4" type="button"></button>
+            <button class="casa" data-index="4" aria-label="Casa 5" type="button"></button>
+            <button class="casa" data-index="5" aria-label="Casa 6" type="button"></button>
+            <button class="casa" data-index="6" aria-label="Casa 7" type="button"></button>
+            <button class="casa" data-index="7" aria-label="Casa 8" type="button"></button>
+            <button class="casa" data-index="8" aria-label="Casa 9" type="button"></button>
+        </div>
 
-    <!--Botão para alternar entre tema claro e escuro-->
-    <button id="alternar-tema" type="button">Usar tema escuro</button>
+        <div class="acoes">
+            <button id="reiniciar" type="button">Reiniciar</button>
+            <button id="zerar-placar" type="button">Zerar placar</button>
+        </div>
+    </main>
 
     <script src="script.js"></script>
 </body>

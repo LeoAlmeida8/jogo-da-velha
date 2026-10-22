@@ -1,56 +1,28 @@
-# jogo-da-velha
+# Jogo da Velha
 
+Um jogo da velha para navegador, criado para praticar HTML, CSS e JavaScript. É possível jogar contra outra pessoa no mesmo dispositivo ou enfrentar o computador.
 
+## Como jogar
 
+Abra o arquivo `index.html` em um navegador. Escolha o modo de jogo e, quando jogar contra o computador, selecione o nível de dificuldade. Clique em uma casa para fazer sua jogada.
 
+Use **Reiniciar** para começar uma nova partida. O placar pode ser zerado pelo botão **Zerar placar**.
 
-\# Jogo da Velha
+## Recursos
 
+- Modo humano contra humano
+- Modo humano contra computador com níveis fácil, médio e difícil
+- Detecção de vitória e empate
+- Destaque das casas da combinação vencedora
+- Placar salvo no navegador
+- Layout responsivo com visual cyberpunk e painel em formato vertical, inspirado em uma tela de celular
 
+## Arquivos
 
-Um jogo da velha para dois jogadores no mesmo dispositivo, feito para praticar HTML, CSS e JavaScript.
+- `index.html`: estrutura da página
+- `style.css`: aparência e layout
+- `script.js`: regras do jogo e interações
 
+## Tecnologias
 
-
-\## Como jogar
-
-
-
-Abra o arquivo `index.html` em um navegador. Os jogadores se alternam entre X e O. Use o botão \*\*Reiniciar\*\* para começar outra partida.
-
-
-
-\## Recursos
-
-
-
-\- Detecta vitória e empate
-
-\- Destaca a combinação vencedora
-
-\- Mantém o placar salvo no navegador
-
-\- Permite alternar entre tema claro e escuro
-
-\- Funciona em telas menores
-
-
-
-\## Arquivos
-
-
-
-\- `index.html`: estrutura da página
-
-\- `style.css`: aparência do jogo
-
-\- `script.js`: regras e interações
-
-
-
-\## Tecnologias
-
-
-
-HTML, CSS e JavaScript.
-
+HTML, CSS e JavaScript, sem bibliotecas externas.
