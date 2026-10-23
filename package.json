@@ -1,0 +1,22 @@
+{
+  "name": "jogo-da-velha",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Jogo da velha cyberpunk para web e Android.",
+  "scripts": {
+    "prepare:web": "node scripts/prepare-web.mjs",
+    "sync:android": "npm run prepare:web && cap sync android",
+    "open:android": "npm run sync:android && cap open android",
+    "build:apk": "node scripts/ensure-debug-keystore.mjs && npm run sync:android && node scripts/build-apk.mjs assembleDebug",
+    "build:release": "npm run sync:android && node scripts/build-apk.mjs assembleRelease",
+    "build:release-bundle": "npm run sync:android && node scripts/build-apk.mjs bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

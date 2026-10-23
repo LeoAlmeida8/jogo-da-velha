@@ -4,7 +4,7 @@
 <head>
     <!-- Configurações da página -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Jogo da Velha</title>
     <meta name="theme-color" content="#070b18">
     <meta name="mobile-web-app-capable" content="yes">
@@ -104,7 +104,9 @@
     <script type="module" src="script.js"></script>
     <script>
         // Registra o service worker para permitir a experiência instalável e o cache básico do app.
-        if ("serviceWorker" in navigator) {
+        const executandoComoAppNativo = typeof window.Capacitor?.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+
+        if (!executandoComoAppNativo && "serviceWorker" in navigator) {
             window.addEventListener("load", function () {
                 navigator.serviceWorker.register("/service-worker.js").catch(function (erro) {
                     console.error("Não foi possível registrar o service worker:", erro);

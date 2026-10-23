@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Jogo da Velha</string>
+    <string name="title_activity_main">Jogo da Velha</string>
+    <string name="package_name">com.leoal.jogodavelha</string>
+    <string name="custom_url_scheme">com.leoal.jogodavelha</string>
+</resources>

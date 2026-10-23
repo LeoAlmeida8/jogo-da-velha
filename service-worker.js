@@ -1,4 +1,4 @@
-const CACHE_NAME = "jogo-da-velha-v10";
+const CACHE_NAME = "jogo-da-velha-v11";
 const APP_FILES = [
     "/",
     "/index.html",
@@ -6,7 +6,8 @@ const APP_FILES = [
     "/script.js",
     "/manifest.json",
     "/icon-192.png",
-    "/icon-512.png"
+    "/icon-512.png",
+    "/assets/audio/MusicaFundo.ogg"
 ];
 
 self.addEventListener("install", function (evento) {

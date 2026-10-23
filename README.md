@@ -1,6 +1,8 @@
 # Jogo da Velha
+https://jogo-da-velha-online-a0599.web.app/
 
-Jogo da velha para navegador, criado com HTML, CSS e JavaScript. Tem partidas locais, computador com três níveis de dificuldade, partidas online sincronizadas pelo Firebase e instalação como aplicativo da web (PWA).
+
+Jogo da velha cyberpunk para navegador e Android, com partidas locais, computador em três níveis, modo online pelo Firebase e áudio personalizável.
 
 ## Acessar o jogo
 
@@ -8,72 +10,121 @@ Jogo da velha para navegador, criado com HTML, CSS e JavaScript. Tem partidas lo
 
 ## Recursos
 
-- **Humano vs Humano:** duas pessoas jogam no mesmo dispositivo.
-- **Humano vs Computador:** escolha entre os níveis fácil, médio e difícil.
-- **Modo Online:** crie uma sala e compartilhe o código, ou entre usando o código de outra pessoa.
-- **Partidas sincronizadas:** tabuleiro, vez, resultado e placar da sala são atualizados para os dois jogadores.
-- **Controles online:** copie o código da sala, reinicie a rodada, zere o placar ou saia da partida.
-- **Menu Opções:** reúne o modo de jogo, a dificuldade, os controles online e as preferências de áudio.
-- **Música ambiente:** trilha original em estilo arcade, criada com Web Audio, com frases musicais variadas, baixo, acordes e percussão leve.
-- **Controles de áudio:** ligue ou desligue música e efeitos separadamente e ajuste seus volumes. As preferências ficam salvas neste navegador.
-- **Interface responsiva:** layout cyberpunk adaptado para celular e computador.
-- **Instalação como app:** em navegadores compatíveis, instale o jogo ou adicione-o à tela inicial.
+- Humano vs Humano e Humano vs Computador.
+- Computador com níveis fácil, médio e difícil.
+- Modo online com código de sala e sincronização pelo Firebase.
+- Placar, reinício de rodada e controles de sala.
+- Menu Opções com modo, dificuldade, música e efeitos.
+- Layout responsivo para celulares, tablets e computadores.
+- PWA instalável e versão nativa Android em APK.
+- Ícone neon e tela de abertura personalizados no Android.
 
-A música começa após a primeira interação com a página, conforme as regras de reprodução de áudio dos navegadores. Para testar a versão mais recente, use o mesmo endereço nos navegadores que estiver comparando. A versão local e a publicada podem ser diferentes até que seja feito um novo deploy.
+A música começa após a primeira interação com a tela, como exigem os navegadores e o Android WebView. As partidas online precisam de conexão com a internet.
 
-## Arquivos
+## APK para Android
 
-- `index.html` — estrutura da página, metadados do app e registro do service worker.
-- `style.css` — aparência cyberpunk e layout responsivo.
-- `script.js` — regras do jogo, inteligência artificial, áudio e conexão com Firebase.
-- `manifest.json` — nome, cores, modo de exibição e ícones do app instalado.
-- `service-worker.js` — cache dos arquivos principais para a experiência de app.
-- `icon-192.png` e `icon-512.png` — ícones do app em 192 × 192 e 512 × 512 pixels.
-- `firebase.json` e `.firebaserc` — configuração do Firebase Hosting.
+O app Android é criado com Capacitor e mantém a versão web como origem do código. Para compilar no Windows, instale:
+
+- Node.js 22 ou superior.
+- Android Studio 2025.2.1 ou superior.
+- Android SDK pelo SDK Manager do Android Studio: instale Android API 36, Build-Tools 36.0.0 e Platform-Tools. O APK aceita Android 7.0 (API 24) ou superior.
+
+O Android Studio fornece o JDK usado pelo Gradle. Na primeira compilação, o Gradle pode baixar componentes adicionais. Abra a pasta android/ no Android Studio uma vez e deixe a sincronização terminar; isso configura o caminho local do SDK para este computador.
+
+### Preparar o projeto
+
+No PowerShell, entre na pasta do projeto e instale as dependências:
+
+    cd C:\Users\leoal\OneDrive\Desktop\JogoVelha
+    npm install
+
+### Gerar o APK de teste
+
+    npm run build:apk
+
+O APK de depuração aparece em:
+
+    android\app\build\outputs\apk\debug\jogo-da-velha-debug.apk
+
+Copie esse arquivo para o celular Android e abra-o para instalar. Talvez seja necessário permitir a instalação de aplicativos dessa origem nas configurações do aparelho.
+
+Para abrir o projeto nativo no Android Studio:
+
+    npm run open:android
+
+Depois de alterar index.html, style.css ou script.js, rode novamente npm run build:apk para preparar os arquivos web e gerar o APK atualizado.
+
+O comando cria uma chave de depuração local automaticamente, que não é enviada ao GitHub. O APK de depuração serve para instalar e compartilhar diretamente. A publicação na Google Play exige uma versão de lançamento assinada e normalmente usa um Android App Bundle (AAB).
+### Gerar uma versão assinada de lançamento
+
+A chave de lançamento é a identidade permanente do app. Guarde uma cópia segura do arquivo `.jks` e das senhas. Sem a chave original, não será possível assinar atualizações compatíveis para quem instalou o APK diretamente.
+
+1. Na pasta do projeto, gere uma chave privada. O comando pedirá uma senha e dados do certificado:
+
+       keytool -genkeypair -v -keystore android\jogo-da-velha-release.jks -alias jogo-da-velha -keyalg RSA -keysize 2048 -validity 10000
+
+   Se o PowerShell não reconhecer `keytool`, use o `keytool.exe` que fica na pasta `jbr\bin` do Android Studio.
+
+2. Crie `android\keystore.properties` localmente com estes dados, substituindo os valores de exemplo pelas informações da sua chave:
+
+       storeFile=jogo-da-velha-release.jks
+       storePassword=SUA_SENHA_DA_CHAVE
+       keyAlias=jogo-da-velha
+       keyPassword=SUA_SENHA_DA_CHAVE
+
+   O arquivo de propriedades e a chave `.jks` estão excluídos do Git. Não os envie ao GitHub nem compartilhe as senhas.
+
+3. Para criar um APK assinado para instalação direta:
+
+       npm run build:release
+
+   O arquivo será salvo em `android\app\build\outputs\apk\release\jogo-da-velha-release.apk`.
+
+4. Para preparar o formato recomendado para envio à Google Play:
+
+       npm run build:release-bundle
+
+   O Android App Bundle será salvo em `android\app\build\outputs\bundle\release\app-release.aab`. Para a primeira publicação, configure a assinatura de app do Google Play Console.
+
+A versão de lançamento não usa a chave de depuração. Aumente `versionCode` em `android\app\build.gradle` antes de cada atualização publicada.
+
+## Instalar a versão web (PWA)
+
+A versão PWA precisa estar publicada em HTTPS. No Android, abra o link do jogo no navegador e escolha **Instalar app** ou **Adicionar à tela inicial**. Essa opção instala o site como app; para gerar um APK, use os passos acima.
+
+## Arquivos principais
+
+- index.html, style.css, script.js — interface, layout, regras, IA, som e Firebase.
+- manifest.json e service-worker.js — recursos da versão PWA.
+- icon-192.png e icon-512.png — ícones da versão web.
+- capacitor.config.json e android/ — configuração e projeto Android nativo.
+- scripts/prepare-web.mjs, scripts/ensure-debug-keystore.mjs e scripts/build-apk.mjs — preparam o app e compilam versões de teste ou lançamento.
+- assets/icon.png — ícone de origem usado na versão Android.
+- firebase.json e .firebaserc — configuração do Firebase Hosting.
 
 ## Executar localmente
 
 1. Abra a pasta do projeto no Visual Studio Code.
-2. Inicie um servidor local, por exemplo com a extensão **Live Server**.
-3. Abra o endereço HTTP fornecido pelo servidor, como `http://127.0.0.1:5500`.
+2. Inicie um servidor local, por exemplo com a extensão Live Server.
+3. Acesse o endereço HTTP informado pelo servidor, como http://127.0.0.1:5500.
 
-O jogo usa módulos JavaScript e Firebase. Abra a página por um servidor HTTP/HTTPS; abrir `index.html` diretamente como arquivo pode impedir que alguns recursos funcionem.
+Abrir index.html diretamente como arquivo pode impedir que módulos JavaScript e recursos do Firebase funcionem.
 
-## Instalar no celular
+## Firebase
 
-O jogo precisa estar publicado em HTTPS. No Android, abra o link do jogo em um navegador compatível, abra o menu e escolha **Instalar app** ou **Adicionar à tela inicial**. O nome da opção varia conforme o navegador.
+O jogo usa Firebase Authentication com login anônimo e Realtime Database para partidas online. As regras devem permitir acesso apenas aos jogadores autenticados que pertencem à sala. Não use regras públicas como ".read": true ou ".write": true.
 
-Isso instala um app da web, não gera um APK. As partidas online precisam de conexão com a internet.
+O site deste projeto é publicado pelo Firebase Hosting no projeto jogo-da-velha-online-a0599. Para publicar uma atualização web:
 
-## Configuração do Firebase
+    firebase use jogo-da-velha-online-a0599
+    firebase deploy --only hosting
 
-O jogo usa o Firebase Authentication com login anônimo e o Realtime Database para as salas online. Para conectar outro projeto Firebase:
-
-1. Crie um app Web no Firebase e habilite o login anônimo.
-2. Crie um Realtime Database.
-3. Atualize `firebaseConfig` em `script.js` com os dados do app e a URL do banco.
-4. Configure regras do Realtime Database para limitar o acesso aos jogadores autenticados que pertencem à sala.
-
-Não use regras públicas como `".read": true` ou `".write": true`.
-
-## Publicar atualizações
-
-O Firebase deste projeto é `jogo-da-velha-online-a0599`. No PowerShell, abra a pasta do projeto e selecione o projeto correto antes de publicar:
-
-```powershell
-cd C:\Users\leoal\OneDrive\Desktop\JogoVelha
-firebase use jogo-da-velha-online-a0599
-firebase deploy --only hosting
-```
-
-O deploy atualiza o site e os arquivos servidos pelo Hosting. Ele não publica alterações nas regras do Realtime Database. Depois do deploy, abra o site novamente; se um app instalado ainda mostrar a versão anterior, feche e abra o app para que o service worker atualize o cache.
+Isso atualiza o site. A versão APK precisa ser recompilada separadamente.
 
 ## Tecnologias
 
-- HTML5 e CSS3
-- JavaScript com módulos ES
-- Web Audio API
-- Progressive Web App (manifest e service worker)
-- Firebase Authentication
-- Firebase Realtime Database
-- Firebase Hosting
+- HTML, CSS e JavaScript com módulos ES.
+- Capacitor para o app Android.
+- Música de fundo em assets/audio/MusicaFundo.ogg e efeitos gerados pela Web Audio API.
+- Firebase Authentication e Realtime Database.
+- Firebase Hosting.

@@ -1,0 +1,14 @@
+node_modules/
+www/
+android/.gradle/
+android/local.properties
+android/**/build/
+android/captures/
+*.jks
+*.keystore
+.android-user/
+
+# Segredos de assinatura do app Android
+android/keystore.properties
+android/*.jks
+.firebase/
